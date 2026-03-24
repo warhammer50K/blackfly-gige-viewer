@@ -14,7 +14,7 @@
 static std::atomic<bool> g_running{true};
 static void sig_handler(int) { g_running = false; }
 
-// ── IP 유틸 ──────────────────────────────────────
+// ── IP Utilities ────────────────────────────────
 static constexpr int64_t ip_to_int(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {
     return (int64_t(a) << 24) | (int64_t(b) << 16) | (int64_t(c) << 8) | d;
@@ -27,7 +27,7 @@ static std::string ip_to_str(int64_t ip)
         (ip >> 8) & 0xFF, ip & 0xFF);
 }
 
-// ── Persistent IP 설정 ──────────────────────────────
+// ── Persistent IP Configuration ─────────────────
 static bool set_persistent_ip(Spinnaker::CameraPtr pCam)
 {
     using namespace Spinnaker::GenApi;
@@ -41,24 +41,24 @@ static bool set_persistent_ip(Spinnaker::CameraPtr pCam)
         pCam->Init();
         INodeMap& nm = pCam->GetNodeMap();
 
-        // Persistent IP 모드 활성화
+        // Enable persistent IP mode
         CBooleanPtr persistEn = nm.GetNode("GevCurrentIPConfigurationPersistentIP");
         if (!IsWritable(persistEn))
         {
-            spdlog::error("GevCurrentIPConfigurationPersistentIP 노드에 쓸 수 없습니다.");
+            spdlog::error("GevCurrentIPConfigurationPersistentIP node is not writable");
             pCam->DeInit();
             return false;
         }
         persistEn->SetValue(true);
 
-        // Persistent IP / Mask / Gateway 설정
+        // Set persistent IP / Mask / Gateway
         CIntegerPtr persistIP   = nm.GetNode("GevPersistentIPAddress");
         CIntegerPtr persistMask = nm.GetNode("GevPersistentSubnetMask");
         CIntegerPtr persistGW   = nm.GetNode("GevPersistentDefaultGateway");
 
         if (!IsWritable(persistIP) || !IsWritable(persistMask) || !IsWritable(persistGW))
         {
-            spdlog::error("Persistent IP 노드에 쓸 수 없습니다.");
+            spdlog::error("Persistent IP nodes are not writable");
             pCam->DeInit();
             return false;
         }
@@ -67,23 +67,23 @@ static bool set_persistent_ip(Spinnaker::CameraPtr pCam)
         persistMask->SetValue(NEW_MASK);
         persistGW->SetValue(NEW_GW);
 
-        spdlog::info("Persistent IP 설정 완료: {} (mask: {}, gw: {})",
+        spdlog::info("Persistent IP configured: {} (mask: {}, gw: {})",
                      ip_to_str(NEW_IP), ip_to_str(NEW_MASK), ip_to_str(NEW_GW));
 
         pCam->DeInit();
-        spdlog::info("카메라 재부팅 또는 재연결 후 적용됩니다.");
+        spdlog::info("Changes will take effect after camera reboot or reconnect");
         return true;
     }
     catch (Spinnaker::Exception& e)
     {
-        spdlog::error("Persistent IP 설정 실패: {}", e.what());
+        spdlog::error("Failed to set persistent IP: {}", e.what());
         try { pCam->DeInit(); } catch(...) {}
         return false;
     }
 }
 
 
-// ── GigE 네트워크 정보 출력 ──────────────────────
+// ── Print GigE Network Info ─────────────────────
 static void print_gige_info(Spinnaker::CameraPtr pCam)
 {
     Spinnaker::GenApi::INodeMap& tldev = pCam->GetTLDeviceNodeMap();
@@ -94,7 +94,7 @@ static void print_gige_info(Spinnaker::CameraPtr pCam)
     if(Spinnaker::GenApi::IsReadable(cam_ip_node) &&
        Spinnaker::GenApi::IsReadable(cam_mask_node))
     {
-        spdlog::info("카메라 IP: {} (mask: {})",
+        spdlog::info("Camera IP: {} (mask: {})",
                      ip_to_str(cam_ip_node->GetValue()),
                      ip_to_str(cam_mask_node->GetValue()));
     }
@@ -104,9 +104,9 @@ int main(int argc, char** argv)
 {
     std::signal(SIGINT, sig_handler);
 
-    // ── 설정 ──────────────────────────────────────
+    // ── Configuration ────────────────────────────
     constexpr int    TARGET_FPS = 30;
-    std::string      target_serial;   // 비워두면 첫 번째 카메라 사용
+    std::string      target_serial;   // empty = use first camera
     bool             do_set_ip = false;
 
     for (int i = 1; i < argc; i++)
@@ -117,21 +117,21 @@ int main(int argc, char** argv)
             target_serial = argv[i];
     }
 
-    // ── Spinnaker 초기화 ──────────────────────────
+    // ── Initialize Spinnaker ────────────────────
     Spinnaker::SystemPtr system = Spinnaker::System::GetInstance();
     Spinnaker::CameraList cam_list = system->GetCameras();
 
     if(cam_list.GetSize() == 0)
     {
-        spdlog::error("카메라를 찾을 수 없습니다.");
+        spdlog::error("No cameras found");
         cam_list.Clear();
         system->ReleaseInstance();
         return 1;
     }
 
-    spdlog::info("발견된 카메라 수: {}", cam_list.GetSize());
+    spdlog::info("Cameras found: {}", cam_list.GetSize());
 
-    // 카메라 목록 출력
+    // List detected cameras
     for(unsigned int i = 0; i < cam_list.GetSize(); i++)
     {
         auto cam_i = cam_list.GetByIndex(i);
@@ -139,7 +139,7 @@ int main(int argc, char** argv)
         Spinnaker::GenApi::CStringPtr sn = tldev.GetNode("DeviceSerialNumber");
         Spinnaker::GenApi::CStringPtr mn = tldev.GetNode("DeviceModelName");
 
-        // GigE IP 정보도 출력
+        // Print GigE IP info
         Spinnaker::GenApi::CIntegerPtr ip_node = tldev.GetNode("GevDeviceIPAddress");
         std::string ip_str = (Spinnaker::GenApi::IsReadable(ip_node)) ?
                              ip_to_str(ip_node->GetValue()) : "N/A";
@@ -152,13 +152,13 @@ int main(int argc, char** argv)
                          ip_str);
     }
 
-    // ── 카메라 선택 ───────────────────────────────
+    // ── Select Camera ────────────────────────────
     Spinnaker::CameraPtr pCam = nullptr;
 
     if(target_serial.empty())
     {
         pCam = cam_list.GetByIndex(0);
-        spdlog::info("시리얼 미지정 → 첫 번째 카메라 사용");
+        spdlog::info("No serial specified, using first camera");
     }
     else
     {
@@ -176,17 +176,17 @@ int main(int argc, char** argv)
         }
         if(!pCam)
         {
-            spdlog::error("시리얼 {} 카메라를 찾을 수 없습니다.", target_serial);
+            spdlog::error("Camera with serial {} not found", target_serial);
             cam_list.Clear();
             system->ReleaseInstance();
             return 1;
         }
     }
 
-    // ── GigE 네트워크 정보 ──────────────────────────
+    // ── GigE Network Info ────────────────────────
     print_gige_info(pCam);
 
-    // ── Persistent IP 설정 모드 ─────────────────────
+    // ── Persistent IP Setup Mode ─────────────────
     if (do_set_ip)
     {
         bool ok = set_persistent_ip(pCam);
@@ -196,7 +196,7 @@ int main(int argc, char** argv)
         return ok ? 0 : 1;
     }
 
-    // ── 카메라 설정 ───────────────────────────────
+    // ── Camera Setup ────────────────────────────
     try
     {
         pCam->Init();
@@ -216,7 +216,7 @@ int main(int argc, char** argv)
         if(Spinnaker::GenApi::IsWritable(fr))
             fr->SetValue(TARGET_FPS);
 
-        // Pixel format — 흑백 카메라(M)는 Mono8, 컬러 카메라(C)는 BGR8
+        // Pixel format — mono cameras use Mono8, color cameras use BGR8
         Spinnaker::GenApi::CEnumerationPtr pf = nm.GetNode("PixelFormat");
         Spinnaker::GenApi::CEnumEntryPtr pf_bgr = pf->GetEntryByName("BGR8");
         Spinnaker::GenApi::CEnumEntryPtr pf_mono = pf->GetEntryByName("Mono8");
@@ -230,22 +230,22 @@ int main(int argc, char** argv)
         {
             pf->SetIntValue(pf_mono->GetValue());
             is_mono = true;
-            spdlog::info("흑백 카메라 → Mono8 사용");
+            spdlog::info("Mono camera detected, using Mono8");
         }
 
-        // 해상도 출력
+        // Print resolution
         Spinnaker::GenApi::CIntegerPtr w_node = nm.GetNode("Width");
         Spinnaker::GenApi::CIntegerPtr h_node = nm.GetNode("Height");
         int w = Spinnaker::GenApi::IsReadable(w_node) ? static_cast<int>(w_node->GetValue()) : 0;
         int h = Spinnaker::GenApi::IsReadable(h_node) ? static_cast<int>(h_node->GetValue()) : 0;
 
         pCam->BeginAcquisition();
-        spdlog::info("Acquisition 시작 ({}x{}, {}fps, {})",
+        spdlog::info("Acquisition started ({}x{}, {}fps, {})",
                      w, h, TARGET_FPS, is_mono ? "Mono8" : "BGR8");
     }
     catch(Spinnaker::Exception& e)
     {
-        spdlog::error("카메라 초기화 실패: {}", e.what());
+        spdlog::error("Camera initialization failed: {}", e.what());
         pCam = nullptr;
         cam_list.Clear();
         system->ReleaseInstance();
@@ -291,7 +291,7 @@ int main(int argc, char** argv)
             }
             raw->Release();
 
-            // FPS 계산 + 화면 표시
+            // Calculate FPS
             frame_count++;
             auto now = std::chrono::steady_clock::now();
             double elapsed = std::chrono::duration<double>(now - t_start).count();
@@ -317,7 +317,7 @@ int main(int argc, char** argv)
             break;
     }
 
-    // ── 정리 ──────────────────────────────────────
+    // ── Cleanup ─────────────────────────────────
     cv::destroyAllWindows();
 
     try
@@ -334,6 +334,6 @@ int main(int argc, char** argv)
     cam_list.Clear();
     system->ReleaseInstance();
 
-    spdlog::info("종료.");
+    spdlog::info("Done.");
     return 0;
 }
