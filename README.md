@@ -14,7 +14,7 @@ A minimal C++ example that streams live video from a FLIR Blackfly GigE camera u
 
 | Dependency | Version | Notes |
 |---|---|---|
-| **OS** | Ubuntu 20.04+ (x86_64) | aarch64 possible if Spinnaker SDK supports it |
+| **OS** | Ubuntu 22.04 (x86_64, tested) | Other Linux distros may work if Spinnaker SDK supports them |
 | **CMake** | 3.16+ | |
 | **C++ Compiler** | C++17 support (GCC 7+) | |
 | **Spinnaker SDK** | 2.x+ | Download from FLIR website |
