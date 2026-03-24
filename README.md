@@ -147,4 +147,13 @@ bfly_test/
 
 ## License
 
-MIT
+This project's source code is licensed under the **MIT License**.
+
+This project depends on the following libraries, each with its own license:
+
+| Library | License |
+|---|---|
+| [Spinnaker SDK](https://www.flir.com/products/spinnaker-sdk/) | FLIR/Teledyne proprietary (must be downloaded separately) |
+| [OpenCV](https://opencv.org/) | Apache 2.0 |
+| [spdlog](https://github.com/gabime/spdlog) | MIT |
+| [fmt](https://github.com/fmtlib/fmt) | MIT (with optional exception) |
