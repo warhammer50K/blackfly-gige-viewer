@@ -1,6 +1,17 @@
-# bfly_test - FLIR Blackfly GigE Camera Viewer
+# blackfly-gige-viewer
 
 A minimal C++ example that streams live video from a FLIR Blackfly GigE camera using the Spinnaker SDK and displays it with OpenCV.
+
+### Tested Environment
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?logo=ubuntu&logoColor=white)
+![GCC](https://img.shields.io/badge/GCC-11.4.0-A42E2B?logo=gnu&logoColor=white)
+![CMake](https://img.shields.io/badge/CMake-3.30.5-064F8C?logo=cmake&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.5.4-5C3EE8?logo=opencv&logoColor=white)
+![Spinnaker](https://img.shields.io/badge/Spinnaker_SDK-4.3.0.189-red)
+![spdlog](https://img.shields.io/badge/spdlog-1.10.0-orange)
+![fmt](https://img.shields.io/badge/fmt-8.1.1-blue)
+![C++17](https://img.shields.io/badge/C++-17-00599C?logo=cplusplus&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 ## Features
 
