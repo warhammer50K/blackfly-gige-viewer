@@ -12,15 +12,15 @@ A minimal C++ example that streams live video from a FLIR Blackfly GigE camera u
 
 ## Requirements
 
-| Dependency | Version | Notes |
+| Dependency | Tested Version | Notes |
 |---|---|---|
-| **OS** | Ubuntu 22.04 (x86_64, tested) | Other Linux distros may work if Spinnaker SDK supports them |
-| **CMake** | 3.16+ | |
-| **C++ Compiler** | C++17 support (GCC 7+) | |
-| **Spinnaker SDK** | 2.x+ | Download from FLIR website |
-| **OpenCV** | 4.x | `apt install libopencv-dev` |
-| **spdlog** | 1.x | Source build or `apt install libspdlog-dev` |
-| **fmt** | 7.x+ | `apt install libfmt-dev` |
+| **OS** | Ubuntu 22.04 (x86_64) | Other Linux distros may work if Spinnaker SDK supports them |
+| **CMake** | 3.30.5 | Minimum 3.16 (per CMakeLists.txt) |
+| **C++ Compiler** | GCC 11.4.0 | C++17 required |
+| **Spinnaker SDK** | 4.3.0.189 | Download from FLIR/Teledyne website |
+| **OpenCV** | 4.5.4 | `apt install libopencv-dev` |
+| **spdlog** | 1.10.0 | Source build or `apt install libspdlog-dev` |
+| **fmt** | 8.1.1 | `apt install libfmt-dev` |
 
 ## 1. Install Dependencies
 
