@@ -84,8 +84,8 @@ echo "net.core.rmem_default=10485760" | sudo tee -a /etc/sysctl.conf
 ## 2. Build
 
 ```bash
-git clone https://github.com/warhammer50K/bfly_test.git
-cd bfly_test
+git clone https://github.com/warhammer50K/blackfly-gige-viewer.git
+cd blackfly-gige-viewer
 mkdir build && cd build
 
 # Default build (Spinnaker: /opt/spinnaker, spdlog: /opt/spdlog)
